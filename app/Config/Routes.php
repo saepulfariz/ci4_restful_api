@@ -7,3 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->resource('posts', ['controller' => 'Posts']);
+
+$routes->group("api", function ($routes) {
+    $routes->post("register", "Register::index");
+});
