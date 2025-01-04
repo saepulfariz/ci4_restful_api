@@ -10,4 +10,5 @@ $routes->resource('posts', ['controller' => 'Posts']);
 
 $routes->group("api", function ($routes) {
     $routes->post("register", "Register::index");
+    $routes->post("login", "Login::index");
 });
