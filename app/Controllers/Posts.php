@@ -145,4 +145,9 @@ class Posts extends ResourceController
 
         return $this->respondDeleted(['id' => $id], 'post deleted');
     }
+
+    public function options()
+    {
+        return $this->response->setStatusCode(200);
+    }
 }
