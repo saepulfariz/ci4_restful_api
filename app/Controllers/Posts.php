@@ -73,7 +73,7 @@ class Posts extends ResourceController
         }
         $data['slug'] = $data['title'];
         $data['status'] = "1";
-        
+
         $post = new \App\Entities\Post($data);
         if (!$this->model->save($post)) {
             return $this->fail($this->model->errors());
@@ -106,13 +106,23 @@ class Posts extends ResourceController
         $record = $this->model->find($id);
         if (!$record) {
             # code...
-            return $this->failNotFound(sprintf(
-                'post with id %d not found',
-                $id
-            ));
+            return $this->failNotFound(
+                'post with id ' . $id . ' not found or already deleted'
+            );
         }
 
         $data = $this->request->getRawInput();
+        $content_type = $this->request->getHeader('Content-Type')->getValue();
+        // $all_headers = $this->request->getHeaders();
+
+        // Header Content-Type : application/x-www-form-urlencoded
+        if($content_type != 'application/x-www-form-urlencoded'){
+            // $data = $this->request->getJson(); // stdClass
+            // var_dump($data);
+            $data = $this->request->getBody(); // String
+            // application/json
+            $data = json_decode($data, true);
+        }
         $data['id'] = $id;
 
         $post = new \App\Entities\Post($data);
@@ -152,10 +162,9 @@ class Posts extends ResourceController
         if (
             $this->model->db->affectedRows() === 0
         ) {
-            return $this->failNotFound(sprintf(
-                'post with id %id not found or already deleted',
-                $id
-            ));
+            return $this->failNotFound(
+                'post with id ' . $id . ' not found or already deleted'
+            );
         }
 
         return $this->respondDeleted(['id' => $id], 'post deleted');
