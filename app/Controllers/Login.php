@@ -55,14 +55,32 @@ class Login extends BaseController
             "sub" => "Subject of the JWT",
             "iat" => $iat, //Time the JWT issued at
             "exp" => $exp, // Expiration time of token
-            "email" => $user['email'],
+            'data' => [
+                'id' => $user['id'],
+                'username' => $user['username'],
+            ]
         );
 
-        $token = JWT::encode($payload, $key, $this->jwtAlg);
+        $accessToken = JWT::encode($payload, $key, $this->jwtAlg);
+
+        $expirationTime = $iat + $this->refreshTokenExpired;
+        $payload = [
+            'iat' => $iat,
+            'exp' => $expirationTime,
+            'data' => [
+                'id' => $user['id'],
+                'username' => $user['username'],
+            ]
+        ];
+
+        $refreshToken = JWT::encode($payload, $this->refreshTokenKey, $this->jwtAlg);
 
         $response = [
             'message' => 'Login Succesful',
-            'token' => $token
+            'data' => [
+                'accessToken' => $accessToken,
+                'refreshToken' => $refreshToken,
+            ]
         ];
 
         return $this->respond($response, 200);
