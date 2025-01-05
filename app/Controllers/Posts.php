@@ -7,8 +7,14 @@ use CodeIgniter\RESTful\ResourceController;
 
 class Posts extends ResourceController
 {
-    protected $modelName = 'App\Models\PostModel';
+    // protected $modelName = 'App\Models\PostModel';
     protected $format = 'json';
+
+    public function __construct()
+    {
+        $this->model = new \App\Models\PostModel();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -16,7 +22,7 @@ class Posts extends ResourceController
      */
     public function index()
     {
-        $data = $this->model->findAll();
+        $data = $this->model->orderBy('id', 'DESC')->findAll();
         return $this->respond($data);
     }
 
@@ -59,6 +65,15 @@ class Posts extends ResourceController
     public function create()
     {
         $data = $this->request->getPost();
+        if(!$data){
+            // $data = $this->request->getJson(); // stdClass
+            // var_dump($data);
+            $data = $this->request->getBody(); // String
+            $data = json_decode($data, true);
+        }
+        $data['slug'] = $data['title'];
+        $data['status'] = "1";
+        
         $post = new \App\Entities\Post($data);
         if (!$this->model->save($post)) {
             return $this->fail($this->model->errors());
