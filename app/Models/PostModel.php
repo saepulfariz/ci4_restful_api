@@ -39,7 +39,7 @@ class PostModel extends Model
         // 'title' => 'required|alpha_numeric_space|min_length[3]|max_length[255]|is_unique[posts.title,id,{id}]',
         'title' => 'required|alpha_numeric_space|min_length[3]|max_length[255]|is_unique[posts.title]',
         'content' => 'required',
-        'status' => 'required'
+        // 'status' => 'required'
     ];
 
     // Validation

@@ -102,4 +102,27 @@ class Cors extends BaseConfig
          */
         'maxAge' => 7200,
     ];
+
+    public array $api = [
+        'allowedOrigins'         => [],
+        'allowedOriginsPatterns' => [],
+        'supportsCredentials'    => true,
+        'allowedHeaders'         => ['Authorization', 'Content-Type'],
+        'exposedHeaders'         => [],
+        'allowedMethods'         => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        'maxAge'                 => 7200,
+    ];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setApi();
+    }
+
+    public function setApi()
+    {
+        $allowedOrigins = getenv('ALLOWED_ORIGINS');
+        $allowedOrigins = explode(';', $allowedOrigins);
+        $this->api['allowedOrigins'] = $allowedOrigins;
+    }
 }
