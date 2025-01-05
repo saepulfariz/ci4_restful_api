@@ -11,6 +11,21 @@ class Login extends BaseController
 {
     use ResponseTrait;
 
+    private $jwtAlg;
+    private $accessTokenKey;
+    private $refreshTokenKey;
+    private $accessTokenExpired;
+    private $refreshTokenExpired;
+
+    public function __construct()
+    {
+        $this->jwtAlg = ($algo = getenv('JWT_ALG')) ? $algo : 'HS256';
+        $this->accessTokenKey = getenv('ACCESS_TOKEN_KEY');
+        $this->refreshTokenKey = getenv('REFRESH_TOKEN_KEY');
+        $this->accessTokenExpired = getenv('ACCESS_TOKEN_EXPIRY');
+        $this->refreshTokenExpired = getenv('REFRESH_TOKEN_EXPIRY');
+    }
+
     public function index()
     {
         $userModel = new UserModel();
@@ -30,9 +45,9 @@ class Login extends BaseController
             return $this->respond(['error' => 'Invalid password.'], 401);
         }
 
-        $key = getenv('JWT_SECRET');
+        $key = $this->accessTokenKey;
         $iat = time(); // current timestamp value
-        $exp = $iat + 3600;
+        $exp = $iat + $this->accessTokenExpired;
 
         $payload = array(
             "iss" => "Issuer of the JWT",
@@ -43,7 +58,7 @@ class Login extends BaseController
             "email" => $user['email'],
         );
 
-        $token = JWT::encode($payload, $key, 'HS256');
+        $token = JWT::encode($payload, $key, $this->jwtAlg);
 
         $response = [
             'message' => 'Login Succesful',
